@@ -53,7 +53,7 @@ axios.defaults.xsrfHeaderName = "x-csrf-token";
 
 createInertiaApp({
   resolve: async (name) => {
-    return await import(`./pages/${name}.jsx`);
+    return await import(`./pages/${name}.tsx`);
   },
   setup({ App, el, props }) {
     createRoot(el).render(<App {...props} />);

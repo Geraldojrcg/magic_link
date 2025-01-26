@@ -66,7 +66,7 @@ config :inertia,
   # The Phoenix Endpoint module for your application. This is used for building
   # asset URLs to compute a unique version hash to track when something has
   # changed (and a reload is required on the frontend).
-  endpoint: MagicLink.Endpoint,
+  endpoint: MagicLinkWeb.Endpoint,
 
   # An optional list of static file paths to track for changes. You'll generally
   # want to include any JavaScript assets that may require a page refresh when
