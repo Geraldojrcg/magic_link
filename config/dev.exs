@@ -26,7 +26,8 @@ config :magic_link, MagicLinkWeb.Endpoint,
   secret_key_base: "cawnBybUeP1Km2RFSJDdKqvasdxbGkq1JDcEGdRgU6gz8xFQ1QNfKnc6hJ+0zRgf",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:magic_link, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:magic_link, ~w(--watch)]}
+    tailwind: {Tailwind, :install_and_run, [:magic_link, ~w(--watch)]},
+    npm: ["--prefix", "assets", "run", "typecheck", "--", "--watch"]
   ]
 
 # ## SSL Support

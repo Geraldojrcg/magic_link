@@ -11,6 +11,7 @@ defmodule MagicLinkWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug Inertia.Plug
   end
 
   pipeline :api do
