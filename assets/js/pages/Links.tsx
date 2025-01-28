@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,47 +19,34 @@ import {
 } from "@/components/ui/table";
 import { BioLinkGenerator } from "@/components/domain/bio-link-generator";
 import { Layout } from "@/components/core/layout";
+import { useForm } from "@inertiajs/react";
+import { Loader2 } from "lucide-react";
 
 interface Link {
   id: string;
   originalUrl: string;
   shortUrl: string;
-  visits: number;
+  visitCount: number;
   lastVisited: Date | null;
 }
 
-export default function Links() {
-  const [links, setLinks] = useState<Link[]>([
-    {
-      id: "1",
-      originalUrl: "https://www.exemplo.com",
-      shortUrl: "https://encurta.do/abc123",
-      visits: 5,
-      lastVisited: new Date("2023-05-15T10:30:00"),
-    },
-    {
-      id: "2",
-      originalUrl: "https://www.outroexemplo.com",
-      shortUrl: "https://encurta.do/def456",
-      visits: 10,
-      lastVisited: new Date("2023-05-16T14:45:00"),
-    },
-  ]);
-  const [newUrl, setNewUrl] = useState("");
+type LinksPageProps = {
+  links: Link[];
+};
+
+export default function Links({ links }: LinksPageProps) {
+  const { data, setData, reset, post, processing, errors } = useForm({
+    original_url: "",
+  });
 
   const handleCreateLink = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newUrl) {
-      const newLink: Link = {
-        id: Date.now().toString(),
-        originalUrl: newUrl,
-        shortUrl: `https://encurta.do/${Math.random().toString(36).substr(2, 6)}`,
-        visits: 0,
-        lastVisited: null,
-      };
-      setLinks([...links, newLink]);
-      setNewUrl("");
-    }
+
+    post("/links", {
+      onSuccess: () => {
+        reset();
+      },
+    });
   };
 
   return (
@@ -73,14 +59,23 @@ export default function Links() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleCreateLink} className="flex space-x-2">
-            <Input
-              type="url"
-              placeholder="https://www.exemplo.com"
-              value={newUrl}
-              onChange={(e) => setNewUrl(e.target.value)}
-              required
-            />
-            <Button type="submit">Criar Link</Button>
+            <div className="w-full">
+              <Input
+                type="url"
+                placeholder="https://www.exemplo.com"
+                value={data.original_url}
+                onChange={(e) => setData("original_url", e.target.value)}
+                required
+              />
+              {errors.original_url && (
+                <p className="text-sm text-red-500">
+                  Url de origem {errors.original_url}
+                </p>
+              )}
+            </div>
+            <Button type="submit">
+              {processing ? <Loader2 className="animate-spin" /> : "Criar"}
+            </Button>
           </form>
         </CardContent>
       </Card>
@@ -99,11 +94,11 @@ export default function Links() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {links.map((link) => (
+              {links?.map((link) => (
                 <TableRow key={link.id}>
                   <TableCell className="font-medium">{link.originalUrl}</TableCell>
                   <TableCell>{link.shortUrl}</TableCell>
-                  <TableCell>{link.visits}</TableCell>
+                  <TableCell>{link.visitCount}</TableCell>
                   <TableCell>
                     {link.lastVisited
                       ? link.lastVisited.toLocaleString()

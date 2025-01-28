@@ -96,6 +96,6 @@ defmodule MagicLinkWeb.Router do
   scope "/api", MagicLinkWeb do
     pipe_through [:api, :fetch_api_user]
 
-    resources "/links", MagicLinkWeb.LinkControllerJSON
+    resources "/links", LinkControllerJSON
   end
 end

@@ -20,7 +20,7 @@ defmodule MagicLinkWeb.LinkJSON do
       id: link.id,
       original_url: link.original_url,
       short_url: link.short_url,
-      published_at: link.published_at
+      visit_count: link.visit_count
     }
   end
 end

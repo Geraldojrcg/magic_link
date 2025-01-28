@@ -8,6 +8,8 @@ import Config
 config :magic_link, MagicLinkWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json"
 
+config :magic_link, base_url: "http://localhost:4000"
+
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: MagicLink.Finch
 

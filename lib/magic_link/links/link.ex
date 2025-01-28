@@ -5,7 +5,7 @@ defmodule MagicLink.Links.Link do
   schema "links" do
     field :original_url, :string
     field :short_url, :string
-    field :published_at, :utc_datetime
+    field :visit_count, :integer
     field :user_id, :id
 
     timestamps(type: :utc_datetime)
@@ -14,8 +14,8 @@ defmodule MagicLink.Links.Link do
   @doc false
   def changeset(link, attrs) do
     link
-    |> cast(attrs, [:original_url, :short_url, :published_at])
-    |> validate_required([:original_url, :short_url, :published_at])
+    |> cast(attrs, [:original_url, :short_url, :visit_count, :user_id])
+    |> validate_required([:original_url, :short_url, :user_id])
     |> unique_constraint(:short_url)
   end
 end

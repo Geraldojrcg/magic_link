@@ -66,6 +66,8 @@ config :magic_link, MagicLinkWeb.Endpoint,
 # Enable dev routes for dashboard and mailbox
 config :magic_link, dev_routes: true
 
+config :magic_link, base_url: "http://localhost:4000"
+
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 
