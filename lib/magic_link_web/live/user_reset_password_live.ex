@@ -5,7 +5,7 @@ defmodule MagicLinkWeb.UserResetPasswordLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
+    <div class="mx-auto max-w-sm px-4 py-20 sm:px-6 lg:px-8">
       <.header class="text-center">Reset Password</.header>
 
       <.simple_form

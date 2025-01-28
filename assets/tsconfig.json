@@ -7,8 +7,12 @@
       "dom.iterable",
       "esnext"
     ],
-    "rootDir": "js",
-    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./js/*"
+      ]
+    },
     "module": "esnext",
     "moduleResolution": "bundler",
     "target": "es2020",
@@ -23,10 +27,6 @@
     "skipLibCheck": true,
     "strict": true
   },
-  "include": [
-    "tsconfig.json",
-    "js/**/*.(ts|tsx|js|jsx)",
-  ],
   "exclude": [
     "node_modules"
   ]

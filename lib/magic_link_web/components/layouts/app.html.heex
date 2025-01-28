@@ -1,18 +1,32 @@
-<header class="px-4 sm:px-6 lg:px-8">
-  <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
-    <div>
-      <a href="/" class="flex items-center gap-4">
-        <img src={~p"/images/logo.svg"} width="36" />
-        <p class="bg-brand/5 text-brand rounded-full px-2 font-medium leading-6">
-          Magic Link - Encurtador de URL
-        </p>
-      </a>
-    </div>
+<header class="bg-primary text-primary-foreground py-4">
+  <div class="container mx-auto px-4 flex justify-between items-center">
+    <a href="/">
+      <h1 class="text-2xl font-bold">Magic Link</h1>
+    </a>
+    <nav>
+      <ul class="flex space-x-4">
+        <li>
+          <a href="#features" class="hover:underline">
+            Recursos
+          </a>
+        </li>
+        <li>
+          <a href="#pricing" class="hover:underline">
+            Preços
+          </a>
+        </li>
+        <li>
+          <a href="/users/log_in" class="hover:underline">
+            Entrar
+          </a>
+        </li>
+      </ul>
+    </nav>
   </div>
 </header>
-<main class="px-4 py-20 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-2xl">
-    <.flash_group flash={@flash} />
+<main>
+  <.flash_group flash={@flash} />
+  <div>
     {@inner_content}
   </div>
 </main>

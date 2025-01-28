@@ -18,6 +18,10 @@ defmodule MagicLinkWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :private_layout do
+    plug :put_layout, html: {MagicLinkWeb.Layouts, :authenticated}
+  end
+
   scope "/", MagicLinkWeb do
     pipe_through :browser
 
@@ -52,6 +56,7 @@ defmodule MagicLinkWeb.Router do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live_session :redirect_if_user_is_authenticated,
+      layout: {MagicLinkWeb.Layouts, :app},
       on_mount: [{MagicLinkWeb.UserAuth, :redirect_if_user_is_authenticated}] do
       live "/users/register", UserRegistrationLive, :new
       live "/users/log_in", UserLoginLive, :new
@@ -63,13 +68,16 @@ defmodule MagicLinkWeb.Router do
   end
 
   scope "/", MagicLinkWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through [:browser, :require_authenticated_user, :private_layout]
 
     live_session :require_authenticated_user,
+      layout: {MagicLinkWeb.Layouts, :authenticated},
       on_mount: [{MagicLinkWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
+
+    resources "/links", LinkController
   end
 
   scope "/", MagicLinkWeb do
@@ -78,9 +86,16 @@ defmodule MagicLinkWeb.Router do
     delete "/users/log_out", UserSessionController, :delete
 
     live_session :current_user,
+      layout: {MagicLinkWeb.Layouts, :app},
       on_mount: [{MagicLinkWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
+  end
+
+  scope "/api", MagicLinkWeb do
+    pipe_through [:api, :fetch_api_user]
+
+    resources "/links", MagicLinkWeb.LinkControllerJSON
   end
 end

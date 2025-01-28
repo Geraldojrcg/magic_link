@@ -54,8 +54,7 @@ defmodule MagicLinkWeb do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {MagicLinkWeb.Layouts, :app}
+      use Phoenix.LiveView
 
       unquote(html_helpers())
     end
@@ -93,6 +92,8 @@ defmodule MagicLinkWeb do
       import Phoenix.HTML
       # Core UI components
       import MagicLinkWeb.CoreComponents
+      # Domain specific components
+      import MagicLinkWeb.DomainComponents
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS

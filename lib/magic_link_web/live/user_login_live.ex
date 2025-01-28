@@ -3,7 +3,7 @@ defmodule MagicLinkWeb.UserLoginLive do
 
   def render(assigns) do
     ~H"""
-    <div class="mx-auto max-w-sm">
+    <div class="mx-auto max-w-md px-4 py-20 sm:px-6 lg:px-8">
       <.header class="text-center">
         Log in to account
         <:subtitle>

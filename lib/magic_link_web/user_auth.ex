@@ -3,7 +3,9 @@ defmodule MagicLinkWeb.UserAuth do
 
   import Plug.Conn
   import Phoenix.Controller
+  import Inertia.Controller
 
+  alias MagicLinkWeb.UserJSON
   alias MagicLink.Accounts
 
   # Make the remember me cookie valid for 60 days.
@@ -93,7 +95,24 @@ defmodule MagicLinkWeb.UserAuth do
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
     user = user_token && Accounts.get_user_by_session_token(user_token)
-    assign(conn, :current_user, user)
+
+    %{data: parsed_user} = UserJSON.serialize(user)
+
+    conn
+    |> assign(:current_user, user)
+    |> assign_prop(:current_user, parsed_user)
+  end
+
+  def fetch_api_user(conn, _opts) do
+    with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
+         {:ok, user} <- Accounts.get_user_by_session_token(token) do
+      assign(conn, :current_user, user)
+    else
+      _ ->
+        conn
+        |> send_resp(:unauthorized, "Invalid token")
+        |> halt()
+    end
   end
 
   defp ensure_user_token(conn) do
@@ -225,5 +244,5 @@ defmodule MagicLinkWeb.UserAuth do
 
   defp maybe_store_return_to(conn), do: conn
 
-  defp signed_in_path(_conn), do: ~p"/"
+  defp signed_in_path(_conn), do: ~p"/links"
 end
