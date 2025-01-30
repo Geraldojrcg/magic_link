@@ -50,20 +50,30 @@ defmodule MagicLink.Links do
   def get_link!(id), do: Repo.get!(Link, id)
 
   @doc """
-  Gets a single link by short_url.
+  Gets a single link by short_id.
 
   Raises `Ecto.NoResultsError` if the Link does not exist.
 
   ## Examples
 
-      iex> get_link_by_short_url!("short_url")
+      iex> get_link_by_short_id!("short_id")
       %Link{}
 
-      iex> get_link_by_short_url!("unknown_short_url")
+      iex> get_link_by_short_id!("unknown_short_id")
       ** (Ecto.NoResultsError)
 
   """
-  def get_link_by_short_url!(short_url), do: Repo.get_by!(Link, short_url: short_url)
+  def get_link_by_short_id!(short_id) do
+    Repo.get_by(Link, short_id: short_id)
+    |> case do
+      nil ->
+        {:error, "Link not found"}
+
+      link ->
+        link
+        |> update_link(%{visit_count: link.visit_count + 1})
+    end
+  end
 
   @doc """
   Creates a link.
@@ -78,8 +88,14 @@ defmodule MagicLink.Links do
 
   """
   def create_link(attrs \\ %{}) do
+    short_id = create_random_short_id()
+
     %Link{}
-    |> Link.changeset(Map.put(attrs, "short_url", create_random_short_url()))
+    |> Link.changeset(
+      attrs
+      |> Map.put("short_id", short_id)
+      |> Map.put("short_url", get_short_url(short_id))
+    )
     |> Repo.insert()
   end
 
@@ -130,10 +146,12 @@ defmodule MagicLink.Links do
     Link.changeset(link, attrs)
   end
 
-  def create_random_short_url() do
-    base_url = Application.get_env(:magic_link, :base_url, "")
-    code = :crypto.strong_rand_bytes(4) |> Base.url_encode64()
+  defp create_random_short_id() do
+    :crypto.strong_rand_bytes(4) |> Base.url_encode64()
+  end
 
-    base_url <> "/l/" <> code
+  defp get_short_url(short_id) do
+    base_url = Application.get_env(:magic_link, :base_url, "")
+    base_url <> "/l/" <> short_id
   end
 end

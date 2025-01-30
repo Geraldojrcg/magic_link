@@ -83,6 +83,8 @@ defmodule MagicLinkWeb.Router do
   scope "/", MagicLinkWeb do
     pipe_through [:browser]
 
+    get "/l/:short_id", LinkResolverController, :show
+
     delete "/users/log_out", UserSessionController, :delete
 
     live_session :current_user,

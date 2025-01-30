@@ -27,7 +27,7 @@ interface Link {
   originalUrl: string;
   shortUrl: string;
   visitCount: number;
-  lastVisited: Date | null;
+  insertedAt: string;
 }
 
 type LinksPageProps = {
@@ -35,6 +35,8 @@ type LinksPageProps = {
 };
 
 export default function Links({ links }: LinksPageProps) {
+  console.log(links);
+
   const { data, setData, reset, post, processing, errors } = useForm({
     original_url: "",
   });
@@ -87,22 +89,38 @@ export default function Links({ links }: LinksPageProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>URL Original</TableHead>
                 <TableHead>Link Encurtado</TableHead>
+                <TableHead>URL Original</TableHead>
                 <TableHead>Visitas</TableHead>
-                <TableHead>Último Acesso</TableHead>
+                <TableHead>Criado em</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {links?.map((link) => (
                 <TableRow key={link.id}>
-                  <TableCell className="font-medium">{link.originalUrl}</TableCell>
-                  <TableCell>{link.shortUrl}</TableCell>
-                  <TableCell>{link.visitCount}</TableCell>
+                  <TableCell className="font-medium">
+                    <a
+                      href={link.shortUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline"
+                    >
+                      {link.shortUrl}
+                    </a>
+                  </TableCell>
                   <TableCell>
-                    {link.lastVisited
-                      ? link.lastVisited.toLocaleString()
-                      : "Nunca acessado"}
+                    <a
+                      href={link.originalUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline"
+                    >
+                      {link.originalUrl}
+                    </a>
+                  </TableCell>
+                  <TableCell>{link.visitCount ?? 0}</TableCell>
+                  <TableCell>
+                    {new Date(link.insertedAt).toLocaleDateString("pt-BR")}
                   </TableCell>
                 </TableRow>
               ))}
