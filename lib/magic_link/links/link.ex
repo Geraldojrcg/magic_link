@@ -2,12 +2,15 @@ defmodule MagicLink.Links.Link do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias MagicLink.Accounts.User
+
   schema "links" do
     field :original_url, :string
     field :short_id, :string
     field :short_url, :string
     field :visit_count, :integer
-    field :user_id, :id
+
+    belongs_to :user, User
 
     timestamps(type: :utc_datetime)
   end

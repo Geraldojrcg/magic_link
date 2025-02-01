@@ -24,7 +24,6 @@ import topbar from "topbar";
 import axios from "axios";
 import { createInertiaApp } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
-import { Toaster } from "./components/ui/toaster";
 
 let csrfToken = document
   ?.querySelector("meta[name='csrf-token']")
@@ -51,24 +50,11 @@ window.liveSocket = liveSocket;
 
 axios.defaults.xsrfHeaderName = "x-csrf-token";
 
-function Root({ children }: React.PropsWithChildren) {
-  return (
-    <main>
-      {children}
-      <Toaster />
-    </main>
-  );
-}
-
 createInertiaApp({
   resolve: async (name) => {
     return await import(`./pages/${name}.tsx`);
   },
   setup({ App, el, props }) {
-    createRoot(el).render(
-      <Root>
-        <App {...props} />
-      </Root>,
-    );
+    createRoot(el).render(<App {...props} />);
   },
 });

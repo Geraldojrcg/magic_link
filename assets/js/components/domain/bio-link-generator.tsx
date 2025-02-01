@@ -1,54 +1,59 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { BioLink } from "@/types";
+import { Trash2 } from "lucide-react";
+import { useForm } from "@inertiajs/react";
 
-interface PersonalLink {
-  id: string;
-  title: string;
-  url: string;
-}
+type BioLinkGeneratorProps = {
+  bioLink?: BioLink;
+};
 
-interface BioLinkGenerator {
-  title: string;
-  description: string;
-  banner: string;
-  personalLinks: PersonalLink[];
-}
-
-export function BioLinkGenerator() {
-  const [config, setConfig] = useState<BioLinkGenerator>({
-    title: "",
-    description: "",
-    banner: "",
-    personalLinks: [],
+export function BioLinkGenerator({ bioLink }: BioLinkGeneratorProps) {
+  const {
+    data,
+    setData,
+    post,
+    delete: deleteBioLink,
+    processing,
+    errors,
+  } = useForm({
+    title: bioLink?.title ?? "",
+    description: bioLink?.description ?? "",
+    banner: bioLink?.banner ?? "",
+    external_links: bioLink?.external_links ?? [],
   });
 
-  const addPersonalLink = () => {
-    setConfig((prev) => ({
+  const addExternal = () => {
+    setData((prev) => ({
       ...prev,
-      personalLinks: [
-        ...prev.personalLinks,
-        { id: Date.now().toString(), title: "", url: "" },
+      external_links: [
+        ...prev.external_links,
+        {
+          id: "",
+          title: "",
+          url: "",
+          bio_link_id: "",
+        },
       ],
     }));
   };
 
-  const updatePersonalLink = (id: string, field: "title" | "url", value: string) => {
-    setConfig((prev) => ({
+  const updateExternalLink = (id: string, field: "title" | "url", value: string) => {
+    setData((prev) => ({
       ...prev,
-      personalLinks: prev.personalLinks.map((link) =>
+      external_links: prev.external_links.map((link) =>
         link.id === id ? { ...link, [field]: value } : link,
       ),
     }));
   };
 
-  const removePersonalLink = (id: string) => {
-    setConfig((prev) => ({
+  const removeExternalLink = (id: string) => {
+    setData((prev) => ({
       ...prev,
-      personalLinks: prev.personalLinks.filter((link) => link.id !== id),
+      external_links: prev.external_links.filter((link) => link.id !== id),
     }));
   };
 
@@ -64,59 +69,63 @@ export function BioLinkGenerator() {
               <Label htmlFor="title">Título</Label>
               <Input
                 id="title"
-                value={config.title}
-                onChange={(e) =>
-                  setConfig((prev) => ({ ...prev, title: e.target.value }))
-                }
+                value={data.title}
+                onChange={(e) => setData((prev) => ({ ...prev, title: e.target.value }))}
                 placeholder="Seu nome ou título da página"
               />
+              {errors.title && <p className="text-sm text-red-500">Título inválido</p>}
             </div>
             <div>
               <Label htmlFor="description">Descrição</Label>
               <Textarea
                 id="description"
-                value={config.description}
+                value={data.description}
                 onChange={(e) =>
-                  setConfig((prev) => ({ ...prev, description: e.target.value }))
+                  setData((prev) => ({ ...prev, description: e.target.value }))
                 }
                 placeholder="Uma breve descrição sobre você ou sua página"
               />
+              {errors.description && (
+                <p className="text-sm text-red-500">Descrição inválida</p>
+              )}
             </div>
             <div>
               <Label htmlFor="banner">URL do Banner</Label>
               <Input
                 id="banner"
-                value={config.banner}
-                onChange={(e) =>
-                  setConfig((prev) => ({ ...prev, banner: e.target.value }))
-                }
+                value={data.banner}
+                onChange={(e) => setData((prev) => ({ ...prev, banner: e.target.value }))}
                 placeholder="https://exemplo.com/seu-banner.jpg"
               />
+              {errors.banner && <p className="text-sm text-red-500">Banner inválido</p>}
             </div>
             <div>
               <Label>Links Pessoais</Label>
-              {config.personalLinks.map((link) => (
+              {data.external_links.map((link) => (
                 <div key={link.id} className="flex space-x-2 mt-2">
                   <Input
                     value={link.title}
-                    onChange={(e) => updatePersonalLink(link.id, "title", e.target.value)}
+                    onChange={(e) => updateExternalLink(link.id, "title", e.target.value)}
                     placeholder="Título do link"
                   />
                   <Input
                     value={link.url}
-                    onChange={(e) => updatePersonalLink(link.id, "url", e.target.value)}
+                    onChange={(e) => updateExternalLink(link.id, "url", e.target.value)}
                     placeholder="URL"
                   />
                   <Button
                     type="button"
                     variant="destructive"
-                    onClick={() => removePersonalLink(link.id)}
+                    onClick={() => removeExternalLink(link.id)}
                   >
-                    Remover
+                    <Trash2 size={16} />
                   </Button>
                 </div>
               ))}
-              <Button type="button" onClick={addPersonalLink} className="mt-2">
+              {errors.external_links && (
+                <p className="text-sm text-red-500">Link mal configurado</p>
+              )}
+              <Button type="button" onClick={addExternal} className="mt-2">
                 Adicionar Link
               </Button>
             </div>
@@ -129,19 +138,19 @@ export function BioLinkGenerator() {
         </CardHeader>
         <CardContent>
           <div className="border rounded-lg p-4 space-y-4">
-            {config.banner && (
+            {data.banner && (
               <img
-                src={config.banner || "/placeholder.svg"}
+                src={data.banner || "/placeholder.svg"}
                 alt="Banner"
                 className="w-full h-32 object-cover rounded-lg"
               />
             )}
-            <h2 className="text-2xl font-bold">{config.title || "Seu Título"}</h2>
+            <h2 className="text-2xl font-bold">{data.title || "Seu Título"}</h2>
             <p className="text-gray-600">
-              {config.description || "Sua descrição aparecerá aqui"}
+              {data.description ?? "Sua descrição aparecerá aqui"}
             </p>
             <div className="space-y-2">
-              {config.personalLinks.map((link) => (
+              {data.external_links.map((link) => (
                 <a
                   key={link.id}
                   href={link.url}
@@ -153,6 +162,23 @@ export function BioLinkGenerator() {
                 </a>
               ))}
             </div>
+          </div>
+          <div className="mt-4">
+            <Button
+              onClick={() => post("/links/bio", { preserveScroll: true })}
+              disabled={processing}
+              className="w-full"
+            >
+              {processing ? "Salvando..." : "Salvar Link da Bio"}
+            </Button>
+            <Button
+              variant={"destructive"}
+              onClick={() => deleteBioLink("/links/bio", { preserveScroll: true })}
+              disabled={processing}
+              className="w-full"
+            >
+              {processing ? "Deletando..." : "Deletar Link da Bio"}
+            </Button>
           </div>
         </CardContent>
       </Card>

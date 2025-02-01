@@ -77,7 +77,12 @@ defmodule MagicLinkWeb.Router do
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
 
-    resources "/links", LinkController
+    get "/links", LinkController, :index
+    post "/links", LinkController, :create_link
+    delete "/links/:id", LinkController, :delete_link
+
+    post "/links/bio", LinkController, :create_bio_link
+    delete "/links/bio/:id", LinkController, :delete_bio_link
   end
 
   scope "/", MagicLinkWeb do
@@ -99,5 +104,7 @@ defmodule MagicLinkWeb.Router do
     pipe_through [:api, :fetch_api_user]
 
     resources "/links", LinkControllerJSON
+    resources "/bio_links", BioLinkControllerJSON
+    resources "/external_links", ExternalLinkControllerJSON
   end
 end

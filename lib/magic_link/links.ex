@@ -134,6 +134,23 @@ defmodule MagicLink.Links do
   end
 
   @doc """
+  Deletes a link by id.
+
+  ## Examples
+
+      iex> delete_link_by_id(123)
+      {:ok, %Link{}}
+
+      iex> delete_link_by_id(456)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_link_by_id(id) do
+    link = get_link!(id)
+    delete_link(link)
+  end
+
+  @doc """
   Returns an `%Ecto.Changeset{}` for tracking link changes.
 
   ## Examples

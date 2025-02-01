@@ -19,25 +19,26 @@ import {
 } from "@/components/ui/table";
 import { BioLinkGenerator } from "@/components/domain/bio-link-generator";
 import { Layout } from "@/components/core/layout";
-import { useForm } from "@inertiajs/react";
-import { Loader2 } from "lucide-react";
-
-interface Link {
-  id: string;
-  originalUrl: string;
-  shortUrl: string;
-  visitCount: number;
-  insertedAt: string;
-}
+import { Deferred, useForm } from "@inertiajs/react";
+import { Loader2, Trash2 } from "lucide-react";
+import { BioLink, Link } from "@/types";
+import { toast } from "sonner";
 
 type LinksPageProps = {
   links: Link[];
+  bio_links: BioLink[];
 };
 
-export default function Links({ links }: LinksPageProps) {
-  console.log(links);
-
-  const { data, setData, reset, post, processing, errors } = useForm({
+export default function Links({ links, bio_links }: LinksPageProps) {
+  const {
+    data,
+    setData,
+    reset,
+    post,
+    delete: deleteLink,
+    processing,
+    errors,
+  } = useForm({
     original_url: "",
   });
 
@@ -47,6 +48,16 @@ export default function Links({ links }: LinksPageProps) {
     post("/links", {
       onSuccess: () => {
         reset();
+        toast.success("Link criar com sucesso!");
+      },
+    });
+  };
+
+  const handleDeleteLink = (id: string) => {
+    deleteLink(`/links/${id}`, {
+      onSuccess: () => {
+        reset();
+        toast.success("Link deletado com sucesso!");
       },
     });
   };
@@ -93,6 +104,7 @@ export default function Links({ links }: LinksPageProps) {
                 <TableHead>URL Original</TableHead>
                 <TableHead>Visitas</TableHead>
                 <TableHead>Criado em</TableHead>
+                <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -100,27 +112,35 @@ export default function Links({ links }: LinksPageProps) {
                 <TableRow key={link.id}>
                   <TableCell className="font-medium">
                     <a
-                      href={link.shortUrl}
+                      href={link.short_url}
                       target="_blank"
                       rel="noreferrer"
                       className="underline"
                     >
-                      {link.shortUrl}
+                      {link.short_url}
                     </a>
                   </TableCell>
                   <TableCell>
                     <a
-                      href={link.originalUrl}
+                      href={link.original_url}
                       target="_blank"
                       rel="noreferrer"
                       className="underline"
                     >
-                      {link.originalUrl}
+                      {link.original_url}
                     </a>
                   </TableCell>
-                  <TableCell>{link.visitCount ?? 0}</TableCell>
+                  <TableCell>{link.visit_count ?? 0}</TableCell>
                   <TableCell>
-                    {new Date(link.insertedAt).toLocaleDateString("pt-BR")}
+                    {new Date(link.inserted_at).toLocaleDateString("pt-BR")}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDeleteLink(link.id)}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -130,7 +150,9 @@ export default function Links({ links }: LinksPageProps) {
       </Card>
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">Gere um link para sua Bio</h2>
-        <BioLinkGenerator />
+        <Deferred data="bio_links" fallback={<div>Loading...</div>}>
+          <BioLinkGenerator bioLink={bio_links?.[0]} />
+        </Deferred>
       </div>
     </Layout>
   );
