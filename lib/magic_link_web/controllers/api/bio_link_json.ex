@@ -1,6 +1,7 @@
 defmodule MagicLinkWeb.BioLinkJSON do
   alias MagicLinkWeb.ExternalLinkJSON
   alias MagicLink.BioLinks.BioLink
+  alias MagicLinkWeb.LinkJSON
 
   @doc """
   Renders a list of bio_links.
@@ -22,6 +23,7 @@ defmodule MagicLinkWeb.BioLinkJSON do
       title: bio_link.title,
       description: bio_link.description,
       banner: bio_link.banner,
+      link: LinkJSON.show(%{link: bio_link.link}).data,
       external_links: ExternalLinkJSON.index(%{external_links: bio_link.external_links}).data
     }
   end

@@ -7,7 +7,8 @@ defmodule MagicLink.Repo.Migrations.CreateLinks do
       add :short_id, :string
       add :short_url, :string
       add :visit_count, :integer, default: 0
-      add :user_id, references(:users, on_delete: :nothing)
+
+      add :user_id, references(:users, on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)
     end

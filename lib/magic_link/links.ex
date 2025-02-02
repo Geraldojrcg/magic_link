@@ -30,7 +30,11 @@ defmodule MagicLink.Links do
       [%Link{}, ...]
   """
   def list_links_by_user(user_id) do
-    Repo.all(from l in Link, where: l.user_id == ^user_id)
+    Repo.all(
+      from l in Link,
+        where: l.user_id == ^user_id and l.original_url != "",
+        order_by: [desc: l.inserted_at]
+    )
   end
 
   @doc """

@@ -82,6 +82,7 @@ defmodule MagicLinkWeb.Router do
     delete "/links/:id", LinkController, :delete_link
 
     post "/links/bio", LinkController, :create_bio_link
+    patch "/links/bio/:id", LinkController, :update_bio_link
     delete "/links/bio/:id", LinkController, :delete_bio_link
   end
 

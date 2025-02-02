@@ -7,6 +7,7 @@ defmodule MagicLink.BioLinks do
   alias MagicLink.Repo
 
   alias MagicLink.BioLinks.BioLink
+  alias MagicLink.Links
 
   @doc """
   Returns the list of bio_links.
@@ -18,7 +19,7 @@ defmodule MagicLink.BioLinks do
 
   """
   def list_bio_links do
-    Repo.all(BioLink, preload: [:external_links])
+    Repo.all(BioLink, preload: [:link, :external_links])
   end
 
   @doc """
@@ -30,7 +31,7 @@ defmodule MagicLink.BioLinks do
       [%BioLink{}, ...]
   """
   def list_bio_links_by_user(user_id) do
-    Repo.all(from l in BioLink, where: l.user_id == ^user_id, preload: [:external_links])
+    Repo.all(from l in BioLink, where: l.user_id == ^user_id, preload: [:link, :external_links])
   end
 
   @doc """
@@ -47,7 +48,25 @@ defmodule MagicLink.BioLinks do
       ** (Ecto.NoResultsError)
 
   """
-  def get_bio_link!(id), do: Repo.get!(BioLink, id, preload: [:external_links])
+  def get_bio_link!(id),
+    do: Repo.one(from l in BioLink, where: l.id == ^id, preload: [:link, :external_links])
+
+  @doc """
+  Gets a single bio_link by link_id.
+
+  Raises `Ecto.NoResultsError` if the Bio link does not exist.
+
+  ### Examples
+
+      iex> get_bio_link_by_link_id!(123)
+      %BioLink{}
+
+      iex> get_bio_link_by_link_id!(456)
+      ** (Ecto.NoResultsError)
+  """
+  def get_bio_link_by_link_id!(link_id) do
+    Repo.one(from l in BioLink, where: l.link_id == ^link_id, preload: [:link, :external_links])
+  end
 
   @doc """
   Creates a bio_link.
@@ -62,9 +81,17 @@ defmodule MagicLink.BioLinks do
 
   """
   def create_bio_link(attrs \\ %{}) do
-    %BioLink{}
-    |> BioLink.changeset(attrs)
-    |> Repo.insert()
+    Repo.transaction(fn ->
+      with {:ok, link} <- Links.create_link(%{"user_id" => attrs["user_id"]}),
+           {:ok, bio_link} <-
+             BioLink.changeset(%BioLink{}, attrs |> Map.put("link_id", link.id)) |> Repo.insert() do
+        {:ok, bio_link}
+      else
+        {:error, changeset} ->
+          Repo.rollback(changeset)
+          {:error, changeset}
+      end
+    end)
   end
 
   @doc """

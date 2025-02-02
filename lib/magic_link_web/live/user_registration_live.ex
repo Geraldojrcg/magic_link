@@ -8,13 +8,13 @@ defmodule MagicLinkWeb.UserRegistrationLive do
     ~H"""
     <div class="mx-auto max-w-sm px-4 py-20 sm:px-6 lg:px-8">
       <.header class="text-center">
-        Register for an account
+        Registrar uma conta
         <:subtitle>
-          Already registered?
+          Já registrado?
           <.link navigate={~p"/users/log_in"} class="font-semibold text-brand hover:underline">
-            Log in
+            Entre
           </.link>
-          to your account now.
+          na sua conta agora.
         </:subtitle>
       </.header>
 
@@ -28,15 +28,15 @@ defmodule MagicLinkWeb.UserRegistrationLive do
         method="post"
       >
         <.error :if={@check_errors}>
-          Oops, something went wrong! Please check the errors below.
+          Oops, algo deu errado! Por favor, verifique os erros abaixo.
         </.error>
 
-        <.input field={@form[:name]} type="text" label="Name" required />
+        <.input field={@form[:name]} type="text" label="Nome" required />
         <.input field={@form[:email]} type="email" label="Email" required />
-        <.input field={@form[:password]} type="password" label="Password" required />
+        <.input field={@form[:password]} type="password" label="Senha" required />
 
         <:actions>
-          <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>
+          <.button phx-disable-with="Criando conta..." class="w-full">Criar uma conta</.button>
         </:actions>
       </.simple_form>
     </div>

@@ -19,7 +19,8 @@ defmodule MagicLink.Links.Link do
   def changeset(link, attrs) do
     link
     |> cast(attrs, [:original_url, :short_id, :short_url, :visit_count, :user_id])
-    |> validate_required([:original_url, :short_id, :short_url, :user_id])
+    |> validate_required([:short_id, :short_url, :user_id])
+    |> validate_format(:short_url, ~r/^https?:\/\/.*$/, message: "must be a valid URL")
     |> unique_constraint(:short_id)
   end
 end

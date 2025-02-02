@@ -1,5 +1,5 @@
 import React from "react";
-import { Toaster } from "../ui/toaster";
+import { Toaster } from "../ui/sonner";
 
 export function Layout({ children }: React.PropsWithChildren) {
   return (

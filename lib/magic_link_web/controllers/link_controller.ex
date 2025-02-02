@@ -51,9 +51,29 @@ defmodule MagicLinkWeb.LinkController do
 
   def create_bio_link(%Plug.Conn{assigns: %{current_user: current_user}} = conn, params) do
     case BioLinks.create_bio_link(Map.put(params, "user_id", current_user.id)) do
-      {:ok, _} ->
+      {:ok, bio} ->
+        IO.inspect(bio)
+
         conn
         |> put_flash(:info, "Bio link created successfully.")
+        |> redirect(to: ~p"/links")
+
+      {:error, changeset} ->
+        conn
+        |> assign_errors(changeset)
+        |> redirect(to: ~p"/links")
+    end
+  end
+
+  def update_bio_link(conn, %{"id" => id} = params) do
+    bio_link = BioLinks.get_bio_link!(id)
+
+    IO.inspect(bio_link)
+
+    case BioLinks.update_bio_link(bio_link, params) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Bio link updated successfully.")
         |> redirect(to: ~p"/links")
 
       {:error, changeset} ->

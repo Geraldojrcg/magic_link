@@ -18,6 +18,7 @@ defmodule MagicLinkWeb.ExternalLinkJSON do
   defp data(%ExternalLink{} = external_link) do
     %{
       id: external_link.id,
+      title: external_link.title,
       url: external_link.url
     }
   end

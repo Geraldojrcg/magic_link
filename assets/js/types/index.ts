@@ -13,9 +13,24 @@ export type ExternalLink = {
   bio_link_id: string;
 }
 
+export type ExternalLinkForm = {
+  id: string;
+  title: string;
+  url: string;
+}
+
 export type BioLink = {
+  id: number;
   title: string;
   description?: string;
-  banner?: string;
+  banner: string;
+  link: Link;
   external_links: ExternalLink[];
+}
+
+export type BioLinkForm = {
+  title: string;
+  description?: string;
+  banner: string;
+  external_links: ExternalLinkForm[];
 }

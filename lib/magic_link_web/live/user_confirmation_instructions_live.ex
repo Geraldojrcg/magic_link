@@ -7,22 +7,22 @@ defmodule MagicLinkWeb.UserConfirmationInstructionsLive do
     ~H"""
     <div class="mx-auto max-w-sm px-4 py-20 sm:px-6 lg:px-8">
       <.header class="text-center">
-        No confirmation instructions received?
-        <:subtitle>We'll send a new confirmation link to your inbox</:subtitle>
+        Não recebeu as instruções de confirmação?
+        <:subtitle>Enviaremos um novo link de confirmação para seu e-mail</:subtitle>
       </.header>
 
       <.simple_form for={@form} id="resend_confirmation_form" phx-submit="send_instructions">
         <.input field={@form[:email]} type="email" placeholder="Email" required />
         <:actions>
-          <.button phx-disable-with="Sending..." class="w-full">
-            Resend confirmation instructions
+          <.button phx-disable-with="Enviando..." class="w-full">
+            Reenviar instruções de confirmação
           </.button>
         </:actions>
       </.simple_form>
 
       <p class="text-center mt-4">
-        <.link href={~p"/users/register"}>Register</.link>
-        | <.link href={~p"/users/log_in"}>Log in</.link>
+        <.link href={~p"/users/register"}>Registrar</.link>
+        | <.link href={~p"/users/log_in"}>Entrar</.link>
       </p>
     </div>
     """
@@ -41,7 +41,7 @@ defmodule MagicLinkWeb.UserConfirmationInstructionsLive do
     end
 
     info =
-      "If your email is in our system and it has not been confirmed yet, you will receive an email with instructions shortly."
+      "Se seu e-mail estiver em nosso sistema e ainda não tiver sido confirmado, você receberá um e-mail com instruções em breve."
 
     {:noreply,
      socket

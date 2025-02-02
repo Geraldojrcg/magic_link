@@ -7,12 +7,12 @@ defmodule MagicLinkWeb.UserSettingsLive do
     ~H"""
     <div class="mx-auto max-w-xl px-4 py-8 sm:px-6 lg:px-8">
       <.header class="text-center">
-        Account Settings
-        <:subtitle>Manage your account email address and password settings</:subtitle>
+        Configurações da Conta
+        <:subtitle>Gerencie as configurações de endereço de email e senha da sua conta</:subtitle>
       </.header>
 
       <div class="space-y-12 divide-y">
-        <.input field={@email_form[:name]} type="text" label="Name" disabled />
+        <.input field={@email_form[:name]} type="text" label="Nome" disabled />
         <div>
           <.simple_form
             for={@email_form}
@@ -26,12 +26,12 @@ defmodule MagicLinkWeb.UserSettingsLive do
               name="current_password"
               id="current_password_for_email"
               type="password"
-              label="Current password"
+              label="Senha atual"
               value={@email_form_current_password}
               required
             />
             <:actions>
-              <.button phx-disable-with="Changing...">Change Email</.button>
+              <.button phx-disable-with="Alterando...">Alterar Email</.button>
             </:actions>
           </.simple_form>
         </div>
@@ -51,23 +51,23 @@ defmodule MagicLinkWeb.UserSettingsLive do
               id="hidden_user_email"
               value={@current_email}
             />
-            <.input field={@password_form[:password]} type="password" label="New password" required />
+            <.input field={@password_form[:password]} type="password" label="Nova senha" required />
             <.input
               field={@password_form[:password_confirmation]}
               type="password"
-              label="Confirm new password"
+              label="Confirme a nova senha"
             />
             <.input
               field={@password_form[:current_password]}
               name="current_password"
               type="password"
-              label="Current password"
+              label="Senha atual"
               id="current_password_for_password"
               value={@current_password}
               required
             />
             <:actions>
-              <.button phx-disable-with="Changing...">Change Password</.button>
+              <.button phx-disable-with="Alterando...">Alterar Senha</.button>
             </:actions>
           </.simple_form>
         </div>
@@ -80,10 +80,10 @@ defmodule MagicLinkWeb.UserSettingsLive do
     socket =
       case Accounts.update_user_email(socket.assigns.current_user, token) do
         :ok ->
-          put_flash(socket, :info, "Email changed successfully.")
+          put_flash(socket, :info, "Email alterado com sucesso.")
 
         :error ->
-          put_flash(socket, :error, "Email change link is invalid or it has expired.")
+          put_flash(socket, :error, "O link para alteração de email é inválido ou expirou.")
       end
 
     {:ok, push_navigate(socket, to: ~p"/users/settings")}
@@ -130,7 +130,7 @@ defmodule MagicLinkWeb.UserSettingsLive do
           &url(~p"/users/settings/confirm_email/#{&1}")
         )
 
-        info = "A link to confirm your email change has been sent to the new address."
+        info = "Um link para confirmar a alteração de email foi enviado para o novo endereço."
         {:noreply, socket |> put_flash(:info, info) |> assign(email_form_current_password: nil)}
 
       {:error, changeset} ->

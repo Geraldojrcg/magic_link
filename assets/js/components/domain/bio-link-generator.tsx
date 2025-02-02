@@ -3,9 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { BioLink } from "@/types";
+import { BioLink, BioLinkForm } from "@/types";
 import { Trash2 } from "lucide-react";
 import { useForm } from "@inertiajs/react";
+import { toast } from "sonner";
+import { BioLinkPreview } from "./bio-link-preview";
 
 type BioLinkGeneratorProps = {
   bioLink?: BioLink;
@@ -16,26 +18,36 @@ export function BioLinkGenerator({ bioLink }: BioLinkGeneratorProps) {
     data,
     setData,
     post,
+    patch,
     delete: deleteBioLink,
     processing,
     errors,
-  } = useForm({
+    isDirty,
+    transform,
+  } = useForm<BioLinkForm>({
     title: bioLink?.title ?? "",
     description: bioLink?.description ?? "",
     banner: bioLink?.banner ?? "",
     external_links: bioLink?.external_links ?? [],
   });
 
-  const addExternal = () => {
+  transform((data) => ({
+    ...data,
+    external_links: data.external_links.map((link) => ({
+      title: link.title,
+      url: link.url,
+    })),
+  }));
+
+  const addExternalLink = () => {
     setData((prev) => ({
       ...prev,
       external_links: [
         ...prev.external_links,
         {
-          id: "",
+          id: Date.now().toString(),
           title: "",
           url: "",
-          bio_link_id: "",
         },
       ],
     }));
@@ -57,14 +69,37 @@ export function BioLinkGenerator({ bioLink }: BioLinkGeneratorProps) {
     }));
   };
 
+  const handleCreateBioLink = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (isDirty) {
+      patch(`/links/bio/${bioLink?.id}`, {
+        preserveScroll: true,
+        onSuccess: () => {
+          toast.success("Link da Bio atualizado com sucesso!");
+        },
+      });
+      return;
+    }
+
+    if (bioLink?.id) return;
+
+    post("/links/bio", {
+      preserveScroll: true,
+      onSuccess: () => {
+        toast.success("Link da Bio criado com sucesso!");
+      },
+    });
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Configurar Link do Instagram</CardTitle>
+          <CardTitle>Configure um link para seu Bio</CardTitle>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          <form className="flex flex-col gap-4" onSubmit={handleCreateBioLink}>
             <div>
               <Label htmlFor="title">Título</Label>
               <Input
@@ -93,14 +128,21 @@ export function BioLinkGenerator({ bioLink }: BioLinkGeneratorProps) {
               <Label htmlFor="banner">URL do Banner</Label>
               <Input
                 id="banner"
+                type="url"
                 value={data.banner}
                 onChange={(e) => setData((prev) => ({ ...prev, banner: e.target.value }))}
                 placeholder="https://exemplo.com/seu-banner.jpg"
+                required
               />
               {errors.banner && <p className="text-sm text-red-500">Banner inválido</p>}
             </div>
+            <div className="flex justify-between items-center">
+              <Label className="font-bold">Links Pessoais</Label>
+              <Button type="button" onClick={addExternalLink} className="mt-2">
+                Adicionar Link
+              </Button>
+            </div>
             <div>
-              <Label>Links Pessoais</Label>
               {data.external_links.map((link) => (
                 <div key={link.id} className="flex space-x-2 mt-2">
                   <Input
@@ -109,6 +151,7 @@ export function BioLinkGenerator({ bioLink }: BioLinkGeneratorProps) {
                     placeholder="Título do link"
                   />
                   <Input
+                    type="url"
                     value={link.url}
                     onChange={(e) => updateExternalLink(link.id, "url", e.target.value)}
                     placeholder="URL"
@@ -125,8 +168,19 @@ export function BioLinkGenerator({ bioLink }: BioLinkGeneratorProps) {
               {errors.external_links && (
                 <p className="text-sm text-red-500">Link mal configurado</p>
               )}
-              <Button type="button" onClick={addExternal} className="mt-2">
-                Adicionar Link
+            </div>
+            <hr className="my-2" />
+            <div className="flex flex-col gap-2 mt-4">
+              <Button type="submit" disabled={processing} className="w-full">
+                {processing ? "Salvando..." : "Salvar"}
+              </Button>
+              <Button
+                variant={"destructive"}
+                onClick={() => deleteBioLink("/links/bio", { preserveScroll: true })}
+                disabled={processing}
+                className="w-full"
+              >
+                {processing ? "Deletando..." : "Deletar"}
               </Button>
             </div>
           </form>
@@ -137,49 +191,7 @@ export function BioLinkGenerator({ bioLink }: BioLinkGeneratorProps) {
           <CardTitle>Visualização</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="border rounded-lg p-4 space-y-4">
-            {data.banner && (
-              <img
-                src={data.banner || "/placeholder.svg"}
-                alt="Banner"
-                className="w-full h-32 object-cover rounded-lg"
-              />
-            )}
-            <h2 className="text-2xl font-bold">{data.title || "Seu Título"}</h2>
-            <p className="text-gray-600">
-              {data.description ?? "Sua descrição aparecerá aqui"}
-            </p>
-            <div className="space-y-2">
-              {data.external_links.map((link) => (
-                <a
-                  key={link.id}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full text-center py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  {link.title || "Link Pessoal"}
-                </a>
-              ))}
-            </div>
-          </div>
-          <div className="mt-4">
-            <Button
-              onClick={() => post("/links/bio", { preserveScroll: true })}
-              disabled={processing}
-              className="w-full"
-            >
-              {processing ? "Salvando..." : "Salvar Link da Bio"}
-            </Button>
-            <Button
-              variant={"destructive"}
-              onClick={() => deleteBioLink("/links/bio", { preserveScroll: true })}
-              disabled={processing}
-              className="w-full"
-            >
-              {processing ? "Deletando..." : "Deletar Link da Bio"}
-            </Button>
-          </div>
+          <BioLinkPreview bioLink={data} />
         </CardContent>
       </Card>
     </div>
