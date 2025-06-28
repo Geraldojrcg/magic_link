@@ -31,12 +31,15 @@ config :magic_link, MagicLinkWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :magic_link, MagicLink.Mailer, adapter: Swoosh.Adapters.Local
 
+# Basic auth configuration for admin routes
+config :magic_link, :basic_auth, username: "admin@gmail.com", password: "qwe123qwe"
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.21.5",
   magic_link: [
     args:
-      ~w(js/app.tsx --bundle --target=es2020 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
+      ~w(js/app.tsx --bundle --chunk-names=chunks/[name]-[hash] --splitting --format=esm  --target=es2020 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
@@ -98,6 +101,28 @@ config :inertia,
   # so that SSR failures will not cause 500 errors (but instead will fallback to
   # CSR).
   raise_on_ssr_failure: config_env() != :prod
+
+config :kaffy,
+  # required keys
+  # required
+  otp_app: :magic_link,
+  # required
+  ecto_repo: MagicLink.Repo,
+  # required
+  router: MagicLinkWeb.Router,
+  # optional keys
+  admin_title: "MagicLink",
+  admin_logo: [
+    url: "/images/logo-full.png",
+    style: "width:200px;height:66px;object-fit:contain;"
+  ],
+  admin_logo_mini: "/images/logo.png",
+  hide_dashboard: true,
+  home_page: [schema: [:accounts, :user]],
+  # since v0.10.0
+  enable_context_dashboards: true,
+  # since v0.10.0
+  admin_footer: "Kaffy &copy; 2025"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

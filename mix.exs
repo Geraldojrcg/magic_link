@@ -32,6 +32,7 @@ defmodule MagicLink.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:igniter, "~> 0.6", only: [:dev, :test]},
       {:bcrypt_elixir, "~> 3.0"},
       {:phoenix, "~> 1.7.18"},
       {:phoenix_ecto, "~> 4.5"},
@@ -59,7 +60,8 @@ defmodule MagicLink.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
-      {:inertia, "~> 2.1.0"}
+      {:inertia, "~> 2.0"},
+      {:kaffy, "~> 0.10.0"}
     ]
   end
 
@@ -75,7 +77,11 @@ defmodule MagicLink.MixProject do
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.setup": [
+        "cmd --cd assets npm install --legacy-peer-deps",
+        "tailwind.install --if-missing",
+        "esbuild.install --if-missing"
+      ],
       "assets.build": ["tailwind magic_link", "esbuild magic_link"],
       "assets.deploy": [
         "tailwind magic_link --minify",

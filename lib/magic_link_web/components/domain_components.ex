@@ -10,7 +10,8 @@ defmodule MagicLinkWeb.DomainComponents do
     ~H"""
     <nav class="bg-primary text-primary-foreground">
       <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-        <a href={~p"/links"} class="text-xl font-bold">
+        <a href={~p"/links"} class="text-xl font-bold flex items-center space-x-2">
+          <img src={~p"/images/logo.png"} alt="Magic Link Logo" class="h-8 w-auto object-contain" />
           Magic Link
         </a>
         <div class="relative group">

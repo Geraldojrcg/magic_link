@@ -1,6 +1,7 @@
 defmodule MagicLinkWeb.Router do
   use MagicLinkWeb, :router
 
+  import Plug.BasicAuth
   import MagicLinkWeb.UserAuth
 
   pipeline :browser do
@@ -21,6 +22,12 @@ defmodule MagicLinkWeb.Router do
   pipeline :private_layout do
     plug :put_layout, html: {MagicLinkWeb.Layouts, :authenticated}
   end
+
+  pipeline :admin_auth do
+    plug :basic_auth, Application.compile_env(:magic_link, :basic_auth)
+  end
+
+  use Kaffy.Routes, scope: "/admin", pipe_through: [:admin_auth]
 
   scope "/", MagicLinkWeb do
     pipe_through :browser
@@ -56,7 +63,7 @@ defmodule MagicLinkWeb.Router do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
     live_session :redirect_if_user_is_authenticated,
-      layout: {MagicLinkWeb.Layouts, :app},
+      layout: {MagicLinkWeb.Layouts, :auth},
       on_mount: [{MagicLinkWeb.UserAuth, :redirect_if_user_is_authenticated}] do
       live "/users/register", UserRegistrationLive, :new
       live "/users/log_in", UserLoginLive, :new
@@ -94,7 +101,7 @@ defmodule MagicLinkWeb.Router do
     delete "/users/log_out", UserSessionController, :delete
 
     live_session :current_user,
-      layout: {MagicLinkWeb.Layouts, :app},
+      layout: {MagicLinkWeb.Layouts, :auth},
       on_mount: [{MagicLinkWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new

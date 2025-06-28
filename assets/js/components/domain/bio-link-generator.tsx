@@ -72,17 +72,16 @@ export function BioLinkGenerator({ bioLink }: BioLinkGeneratorProps) {
   const handleCreateBioLink = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isDirty) {
-      patch(`/links/bio/${bioLink?.id}`, {
+    if (isDirty && bioLink?.id) {
+      patch(`/links/bio/${bioLink.id}`, {
         preserveScroll: true,
         onSuccess: () => {
           toast.success("Link da Bio atualizado com sucesso!");
         },
       });
+
       return;
     }
-
-    if (bioLink?.id) return;
 
     post("/links/bio", {
       preserveScroll: true,

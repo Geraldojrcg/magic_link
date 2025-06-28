@@ -12,7 +12,7 @@ export function BioLinkPreview({ bioLink }: BioLinkPreviewProps) {
         <img
           src={bioLink.banner || "/placeholder.svg"}
           alt="Banner"
-          className="w-full h-32 object-cover rounded-lg"
+          className="w-full object-cover rounded-lg"
         />
       )}
       <h2 className="text-2xl font-bold">{bioLink.title || "Seu Título"}</h2>

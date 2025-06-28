@@ -10,6 +10,37 @@ import {
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
+      <header className="bg-primary text-primary-foreground py-4">
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <a href="/" className="flex items-center space-x-2">
+            <img
+              src="/images/logo.png"
+              alt="Magic Link Logo"
+              className="h-8 w-auto object-contain"
+            />
+            <h1 className="text-2xl font-bold">Magic Link</h1>
+          </a>
+          <nav>
+            <ul className="flex space-x-4">
+              <li>
+                <a href="#features" className="hover:underline">
+                  Recursos
+                </a>
+              </li>
+              <li>
+                <a href="#pricing" className="hover:underline">
+                  Preços
+                </a>
+              </li>
+              <li>
+                <a href="/users/log_in" className="hover:underline">
+                  Entrar
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </header>
       <main className="flex-grow">
         <section className="bg-gradient-to-b from-primary to-primary/50 text-primary-foreground py-20">
           <div className="container mx-auto px-4 text-center">
