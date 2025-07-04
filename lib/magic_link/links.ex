@@ -68,7 +68,11 @@ defmodule MagicLink.Links do
 
   """
   def get_link_by_short_id!(short_id) do
-    Repo.get_by(Link, short_id: short_id)
+    Repo.one(
+      from l in Link,
+        where: l.short_id == ^short_id,
+        preload: [:user]
+    )
     |> case do
       nil ->
         {:error, "Link not found"}

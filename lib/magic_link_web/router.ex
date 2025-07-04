@@ -12,6 +12,7 @@ defmodule MagicLinkWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug :put_user_token
     plug Inertia.Plug
   end
 
@@ -109,7 +110,7 @@ defmodule MagicLinkWeb.Router do
   end
 
   scope "/api", MagicLinkWeb do
-    pipe_through [:api, :fetch_api_user]
+    pipe_through [:api, :ensure_bearer_token]
 
     resources "/links", LinkControllerJSON
     resources "/bio_links", BioLinkControllerJSON

@@ -23,13 +23,18 @@ import { Deferred, useForm } from "@inertiajs/react";
 import { Loader2, Trash2 } from "lucide-react";
 import { BioLink, Link } from "@/types";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import userSocket from "@/user_socket";
 
 type LinksPageProps = {
   links: Link[];
   bio_links: BioLink[];
 };
 
-export default function Links({ links, bio_links }: LinksPageProps) {
+export default function Links(props: LinksPageProps) {
+  const [links, setLinks] = useState<Link[]>(props.links || []);
+  const [bioLink, setBioLink] = useState<BioLink | undefined>(props.bio_links?.[0]);
+
   const {
     data,
     setData,
@@ -41,6 +46,35 @@ export default function Links({ links, bio_links }: LinksPageProps) {
   } = useForm({
     original_url: "",
   });
+
+  useEffect(() => {
+    const channel = userSocket.channel("dashboard:lobby", {});
+
+    channel.join();
+
+    channel.on("link_accessed", ({ id, visit_count }) => {
+      setLinks((prevLinks) =>
+        prevLinks.map((link) =>
+          link.id === id ? { ...link, visit_count: visit_count } : link,
+        ),
+      );
+
+      if (bioLink && bioLink.link.id === id) {
+        const newBioLink = {
+          ...bioLink,
+          link: {
+            ...bioLink.link,
+            visit_count: visit_count,
+          },
+        };
+        setBioLink(newBioLink);
+      }
+    });
+
+    return () => {
+      channel.leave();
+    };
+  }, []);
 
   const handleCreateLink = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +96,7 @@ export default function Links({ links, bio_links }: LinksPageProps) {
     });
   };
 
-  const renderBioLink = (bioLink: BioLink) => {
+  const renderBioLink = () => {
     return (
       <div className="flex flex-col gap-2">
         {bioLink && (
@@ -196,7 +230,7 @@ export default function Links({ links, bio_links }: LinksPageProps) {
         <div className="flex flex-col gap-4">
           <h2 className="text-2xl font-bold">Gere um link para sua Bio</h2>
           <Deferred data="bio_links" fallback={<div>Loading...</div>}>
-            {renderBioLink(bio_links?.[0])}
+            {renderBioLink()}
           </Deferred>
         </div>
       </div>

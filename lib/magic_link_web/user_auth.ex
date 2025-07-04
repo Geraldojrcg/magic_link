@@ -103,18 +103,6 @@ defmodule MagicLinkWeb.UserAuth do
     |> assign_prop(:current_user, parsed_user)
   end
 
-  def fetch_api_user(conn, _opts) do
-    with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
-         {:ok, user} <- Accounts.get_user_by_session_token(token) do
-      assign(conn, :current_user, user)
-    else
-      _ ->
-        conn
-        |> send_resp(:unauthorized, "Invalid token")
-        |> halt()
-    end
-  end
-
   defp ensure_user_token(conn) do
     if token = get_session(conn, :user_token) do
       {token, conn}
@@ -126,6 +114,18 @@ defmodule MagicLinkWeb.UserAuth do
       else
         {nil, conn}
       end
+    end
+  end
+
+  def ensure_bearer_token(conn, _opts) do
+    with ["Bearer " <> token] <- get_req_header(conn, "authorization"),
+         {:ok, user} <- Accounts.get_user_by_session_token(token) do
+      assign(conn, :current_user, user)
+    else
+      _ ->
+        conn
+        |> send_resp(:unauthorized, "Unauthorized")
+        |> halt()
     end
   end
 
@@ -229,6 +229,15 @@ defmodule MagicLinkWeb.UserAuth do
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log_in")
       |> halt()
+    end
+  end
+
+  def put_user_token(conn, _) do
+    if current_user = conn.assigns[:current_user] do
+      token = Phoenix.Token.sign(conn, "user socket", current_user.id)
+      assign(conn, :user_token, token)
+    else
+      conn
     end
   end
 

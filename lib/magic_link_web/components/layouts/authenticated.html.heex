@@ -1,3 +1,6 @@
+<script>
+  window.userToken = "<%= assigns[:user_token] %>";
+</script>
 <.navbar current_user={assigns[:current_user]} />
 <main>
   <.flash_group flash={@flash} />
